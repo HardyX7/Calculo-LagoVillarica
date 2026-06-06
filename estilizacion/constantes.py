@@ -30,7 +30,7 @@ ZOOM_MAXIMO = 18
 
 SEMIEJE_MAYOR_KM = 11.5
 SEMIEJE_MENOR_KM = 5.5
-
+#osm_controno son las coordenadas del contorno del lago
 OSM_CONTORNO_KM = [
     (8.9414, -2.1379), (8.7604, -2.0338), (8.6398, -1.8927), (8.3998, -1.8570),
     (8.2424, -1.7531), (8.0288, -1.6318), (7.8977, -1.4616), (7.7537, -1.3409),
