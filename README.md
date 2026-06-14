@@ -1,6 +1,6 @@
 # Calculo Lago Villarrica
 
-Aplicacion de escritorio en Python/Tkinter para modelar el Lago Villarrica con herramientas de calculo diferencial e integral. La app muestra una imagen satelital calibrada, dibuja el contorno del lago, una cuadricula cartesiana, curvas cubicas por tramos, lineas de Riemann, area aproximada, area por integral, volumen idealizado y centroide usado como referencia de abastecimiento.
+Aplicacion de escritorio en Python/Tkinter para modelar el Lago Villarrica con herramientas de calculo diferencial e integral. La app muestra una imagen satelital calibrada, dibuja el contorno del lago, una cuadricula cartesiana, curvas cubicas por tramos, lineas de Riemann, area aproximada, area por integral, volumen idealizado y centroide usado como referencia de abastecimiento. Ademas este repositositorio cuenta con una calculadora de curvas polinomicas de grado 3 usando interpolacion polinomica, en la cual se ingresan 4 puntos y se trazara una curva de grado 3 que pasa por esos 4 puntos, graficandola en el proceso.
 
 ## Como ejecutar
 
@@ -11,6 +11,19 @@ python -B main.py
 ```
 
 El parametro `-B` evita que Python genere carpetas `__pycache__`. El archivo `main.py` tambien activa `sys.dont_write_bytecode` antes de abrir la interfaz.
+
+Para poder ejecutar el archivo `calculadora_curvas_polinomicas.py` es nesesario instalar los modulos de `numpy` y `matplotlib` de la siguiente manera:
+
+```bash
+pip install -r requirements.txt
+```
+
+Una vez instalado:
+
+```bash
+python calculadora_curvas_polimnomicas.py
+```
+
 
 ## Flujo de la app
 
