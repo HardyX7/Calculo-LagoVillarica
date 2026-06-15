@@ -56,6 +56,7 @@ class FuncionPorTramos:
         for limite, poly in self.tramos:
             tramos_str.append(f"x < {limite}: \n  {self.nombre}(x) = {poly}")
         
+        tramos_unidos = "\n".join(tramos_str)
         return f"""
-                {self.nombre}: [{self.dominio[0]}, {self.dominio[1]}] -> R tal que: \n {"\n".join(tramos_str)}
+                {self.nombre}: [{self.dominio[0]}, {self.dominio[1]}] -> R tal que: \n {tramos_unidos}
                 """.strip()
