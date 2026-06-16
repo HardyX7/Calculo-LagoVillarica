@@ -30,16 +30,19 @@ class MetodoRiemann(ABC):
 class ExtremoIzquierdo(MetodoRiemann):
     
     def obtener_x(self, a: float, dx: float, i: int) -> float:
-        return a + i * dx
+        x = a + i * dx
+        return x
 
 
 class ExtremoDerecho(MetodoRiemann):
     
     def obtener_x(self, a: float, dx: float, i: int) -> float:
-        return a + (i + 1) * dx
+        x = a + (i + 1) * dx
+        return x
 
 
 class PuntoMedio(MetodoRiemann):
     
     def obtener_x(self, a: float, dx: float, i: int) -> float:
-        return a + (i + 0.5) * dx
+        x = a + (i + 0.5) * dx
+        return x

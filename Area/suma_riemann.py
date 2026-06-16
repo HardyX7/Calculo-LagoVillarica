@@ -1,62 +1,57 @@
-"""Area/suma_riemann.py
+"""Suma de Riemann para aproximar una integral definida."""
 
-Contiene la clase SumaRiemann que aproxima una integral definida mediante
-una suma de Riemann.
+from typing import Callable
 
-Uso:
-    from Area.suma_riemann import SumaRiemann, h
-    from Area.metodos_riemann import PuntoMedio
-    from functions.funciones import f
+from Area.area_entre_curvas import h
+from .metodos_riemann import ExtremoDerecho, ExtremoIzquierdo, MetodoRiemann, PuntoMedio
 
-    riemann = SumaRiemann(funcion=h, intervalo=f.dominio, n=10000, metodo=PuntoMedio())
-    area = riemann()
-
-También define la función h(x) = f(x) - g(x), que representa el área entre
-las curvas f y g.
-"""
-
-from typing import Callable, Tuple
-from .metodos_riemann import MetodoRiemann, PuntoMedio
-
-from functions.funciones import f, g
 
 class SumaRiemann:
-    
     """
-    Clase que aproxima la integral definida de una función
-    mediante una suma de Riemann.
+    Clase que aproxima la integral definida de una funcion
+    usando el metodo de Riemann indicado.
     """
-    
+
     def __init__(
             self,
             funcion: Callable[[float], float],
-            intervalo: Tuple[float, float],
             n: int,
             metodo: MetodoRiemann
         ) -> None:
-        
+
         self.funcion = funcion
-        self.intervalo = intervalo
         self.n = n
         self.metodo = metodo
-    
+        self.intervalo = funcion.dominio
+
     def __call__(self) -> float:
-        
         """
-        Calcula la suma de Riemann usando la estrategia indicada.
+        Calcula la suma de Riemann en el dominio de la funcion.
         """
-        
         a, b = self.intervalo
         dx = (b - a) / self.n
-        
-        suma = 0
-        for i in range(self.n):
-            x = self.metodo.obtener_x(a, dx, i)
-            suma += self.funcion(x)
-        
-        return suma * dx
+
+        return sum(
+            self.funcion(self.metodo.obtener_x(a, dx, i))
+            for i in range(self.n)
+        ) * dx
+
+    def __str__(self) -> str:
+        a, b = self.intervalo
+        nombre = getattr(self.funcion, "nombre", self.funcion.__class__.__name__)
+        metodo = self.metodo.__class__.__name__
+
+        datos = [
+            f"Funcion: {nombre}",
+            f"Intervalo: [{a}, {b}]",
+            f"Subintervalos: {self.n}",
+            f"Metodo: {metodo}",
+        ]
+
+        datos_unidos = "\n".join(datos)
+        return f"Suma de Riemann:\n{datos_unidos}"
 
 
-def h(x: float) -> float:
-    return f(x) - g(x)
-
+extremo_izquierdo = ExtremoIzquierdo()
+extremo_derecho = ExtremoDerecho()
+punto_medio = PuntoMedio()
