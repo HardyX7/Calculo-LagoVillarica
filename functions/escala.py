@@ -12,4 +12,4 @@ class Escala:
         return valor / self.factor
 
 
-escala_lago = Escala(factor=0.75705)
+escala_lago = Escala(factor=0.766)
