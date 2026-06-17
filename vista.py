@@ -5,7 +5,8 @@ from __future__ import annotations
 import tkinter as tk
 
 from estilizacion.moldes_widgets import COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO, COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, COLOR_TEXTO_SUAVE, Crear
-from resultados_lago import AREA_REFERENCIA_KM2, calcular_resultados
+from constantes import AREA_REFERENCIA_KM2
+from resultados_lago import calcular_resultados
 
 
 class VistaPrincipal:

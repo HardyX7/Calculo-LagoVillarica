@@ -9,15 +9,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from Area.Integral import Integral
-from Area.suma_riemann import SumaRiemann
+from Area.area_entre_curvas_riemann import AreaEntreCurvasRiemann
 from Area.metodos_riemann import PuntoMedio
 from functions.funciones import f, g
-from Area.area_entre_curvas import AreaEntreCurvas
-from constantes import AREA_REFERENCIA_KM2, FUENTE_REFERENCIA
+from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
+from constantes import AREA_REFERENCIA_KM2, INTERVALO
 
 punto_medio = PuntoMedio()
-
-h = AreaEntreCurvas(f, g)
 
 
 @dataclass(frozen=True)
@@ -30,36 +28,27 @@ class ResultadoLago:
     error_riemann_pct: float
     error_integral_pct: float
 
-
-def area_por_riemann(n: int) -> float:
-    return SumaRiemann(h, n, punto_medio)()
-
-
-def area_por_integral() -> float:
-    return Integral(h)()
-
-
 def calcular_resultados(n: int) -> ResultadoLago:
     n = int(n)
-    area_riemann = area_por_riemann(n)
-    area_integral = area_por_integral()
+    area_riemann_km2 = AreaEntreCurvasRiemann(f, g, n, punto_medio).area_escalada(INTERVALO)
+    area_integral_km2 = AreaEntreCurvasIntegral(f, g).area_escalada(INTERVALO)
 
     curvas = len(f.tramos) + len(g.tramos)
     return ResultadoLago(
         n=n,
         curvas=curvas,
         curvas_por_lado=curvas // 2,
-        area_riemann_km2=area_riemann,
-        area_integral_km2=area_integral,
-        error_riemann_pct=100 * (area_riemann - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
-        error_integral_pct=100 * (area_integral - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
+        area_riemann_km2=area_riemann_km2,
+        area_integral_km2=area_integral_km2,
+        error_riemann_pct=100 * (area_riemann_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
+        error_integral_pct=100 * (area_integral_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
     )
 
 
 def tabla_riemann(valores_n: tuple[int, ...] = (15, 30, 60, 100)) -> str:
     lineas = ["n     area km2     error"]
     for n in valores_n:
-        area = area_por_riemann(n)
+        area = AreaEntreCurvasRiemann(f, g, n, punto_medio).area_escalada(INTERVALO)
         error = 100 * (area - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2
         lineas.append(f"{n:<5} {area:>8.3f}   {error:>+6.2f}%")
     return "\n".join(lineas)

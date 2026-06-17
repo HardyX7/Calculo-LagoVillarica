@@ -4,9 +4,15 @@ Define las estrategias de selección de puntos para la suma de Riemann.
 
 Uso:
     from Area.metodos_riemann import PuntoMedio, ExtremoIzquierdo, ExtremoDerecho
-
+    
     metodo = PuntoMedio()
     x = metodo.obtener_x(a, dx, i)
+
+Donde:
+
+- a: el inicio del intervalo
+- dx: el ancho de cada subintervalo
+- i: el índice del subintervalo actual (0, 1, 2,
 
 Estas clases se usan dentro de SumaRiemann para calcular el valor x de cada
 subintervalo.

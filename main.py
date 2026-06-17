@@ -4,9 +4,7 @@ import sys
 from vista import VistaPrincipal
 
 
-
-
-"""def main() -> None:
+def main() -> None:
     
     sys.dont_write_bytecode = True
     app = VistaPrincipal()
@@ -15,4 +13,3 @@ from vista import VistaPrincipal
 
 if __name__ == "__main__":
     main()
-"""
