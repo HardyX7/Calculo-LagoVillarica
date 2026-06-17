@@ -1,4 +1,3 @@
-
 """Area/Integral.py
 
 Define la clase Integral para calcular integrales definidas numéricamente.
@@ -14,50 +13,38 @@ Esta clase usa scipy.integrate.quad internamente y sirve para calcular
 una integral definida de cualquier función que se pase como callable.
 """
 
-from typing import Callable, Tuple
+from typing import Tuple
+from functions.funcion_por_tramos import FuncionPorTramos
+from constantes import ESCALA_KM2
 from scipy.integrate import quad
-
-from Area.area_entre_curvas import h
 
 class Integral:
     
     """
-    Clase que representa la integral definida de una función.
-    
-    La función debe ser invocable y poseer un atributo
-    `dominio` de la forma (a, b).
+    Clase para calcular la integral definida de una función dada en un intervalo específico.
     """
     
     def __init__(
             self,
-            funcion: Callable[[float], float]
+            funcion: FuncionPorTramos,
         ) -> None:
         
         self.funcion = funcion
-        self.intervalo = funcion.dominio
     
-    def __call__(self) -> float:
+    def area_escalada(self, intervalo: Tuple[float, float]) -> float:
+        """
+        Calcula el área bajo la curva de la función en el intervalo dado y la escala
+        para convertirla a km2.
+        """
+        area = self(intervalo)
+        return area * ESCALA_KM2
+    
+    def __call__(self, intervalo: Tuple[float, float]) -> float:
         
         """
         Evalúa numéricamente la integral definida
         utilizando scipy.integrate.quad.
         """
-        
-        a, b = self.intervalo
+        a, b = intervalo
         resultado, _ = quad(self.funcion, a, b)
         return resultado
-
-    def __str__(self) -> str:
-        a, b = self.intervalo
-        nombre = getattr(self.funcion, "nombre", self.funcion.__class__.__name__)
-
-        datos = [
-            f"Funcion: {nombre}",
-            f"Intervalo: [{a}, {b}]",
-        ]
-
-        datos_unidos = "\n".join(datos)
-        return f"Integral:\n{datos_unidos}"
-
-integral_area = Integral(funcion=h)
-    

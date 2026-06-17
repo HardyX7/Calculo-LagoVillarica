@@ -9,14 +9,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from Area.Integral import Integral
-from Area.area_entre_curvas import h
-from Area.suma_riemann import SumaRiemann, punto_medio
-from functions.escala import escala_lago
+from Area.suma_riemann import SumaRiemann
+from Area.metodos_riemann import PuntoMedio
 from functions.funciones import f, g
+from Area.area_entre_curvas import AreaEntreCurvas
+from constantes import AREA_REFERENCIA_KM2, FUENTE_REFERENCIA
 
+punto_medio = PuntoMedio()
 
-AREA_REFERENCIA_KM2 = 176.0
-FUENTE_REFERENCIA = "Ilustre Municipalidad de Villarrica: extension aproximada 176 km2."
+h = AreaEntreCurvas(f, g)
 
 
 @dataclass(frozen=True)

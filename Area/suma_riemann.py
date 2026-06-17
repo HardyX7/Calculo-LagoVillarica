@@ -2,8 +2,7 @@
 
 from typing import Callable
 
-from Area.area_entre_curvas import h
-from .metodos_riemann import ExtremoDerecho, ExtremoIzquierdo, MetodoRiemann, PuntoMedio
+from .metodos_riemann import MetodoRiemann
 
 
 class SumaRiemann:
@@ -50,8 +49,3 @@ class SumaRiemann:
 
         datos_unidos = "\n".join(datos)
         return f"Suma de Riemann:\n{datos_unidos}"
-
-
-extremo_izquierdo = ExtremoIzquierdo()
-extremo_derecho = ExtremoDerecho()
-punto_medio = PuntoMedio()
