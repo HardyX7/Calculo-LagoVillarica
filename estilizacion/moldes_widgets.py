@@ -124,6 +124,9 @@ class Crear:
     def fuentes(self, root: tk.Tk) -> dict[str, font.Font]:
         return {
             "titulo": font.Font(root, family="Segoe UI", size=24, weight="bold"),
+            "titulo_mapa": font.Font(root, family="Segoe UI", size=38, weight="bold"),
+            "proporcion": font.Font(root, family="Segoe UI", size=21, weight="bold"),
+            "estado": font.Font(root, family="Segoe UI", size=16, weight="bold"),
             "subtitulo": font.Font(root, family="Segoe UI", size=10),
             "etiqueta": font.Font(root, family="Segoe UI", size=10, weight="bold"),
             "valor": font.Font(root, family="Consolas", size=13, weight="bold"),

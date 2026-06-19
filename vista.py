@@ -1,11 +1,10 @@
 """Vista principal: controles y resultados."""
 
-from __future__ import annotations
-
 import tkinter as tk
 
 from estilizacion.moldes_widgets import COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO, COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, COLOR_TEXTO_SUAVE, Crear
-from constantes import AREA_REFERENCIA_KM2
+from constantes import AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2
+from mapa.mapa_calculo import MapaCalculo
 from resultados_lago import calcular_resultados
 
 
@@ -34,25 +33,43 @@ class VistaPrincipal:
         self.crear_panel_resultados()
         self.crear_espacio_imagen()
 
-    def ejecutar(self) -> None:
+    def ejecutar(self):
         self.root.mainloop()
 
-    def crear_panel_resultados(self) -> None:
+    def crear_panel_resultados(self):
         panel = self.crear.frame(self.fondo, fondo=COLOR_PANEL, borde=True)
-        panel.place(relx=0.035, rely=0.06, relwidth=0.32, relheight=0.88)
+        panel.place(relx=0.03, rely=0.06, relwidth=0.21, relheight=0.88)
 
         self.crear.etiqueta(panel, "Lago Villarrica\nmodelo de calculo", fuentes=self.fuentes, estilo="titulo", fondo=COLOR_PANEL, color=COLOR_TEXTO, justify="left", anchor="w").pack(fill="x", padx=16, pady=(14, 2))
         self.crear.etiqueta(panel, "Area por Riemann e integral", fuentes=self.fuentes, estilo="subtitulo", fondo=COLOR_PANEL, color=COLOR_TEXTO_SUAVE, justify="left", wraplength=330, anchor="w").pack(fill="x", padx=16, pady=(0, 10))
 
         self.crear_controles(panel)
         self.crear_tarjetas(panel)
-        self.crear.etiqueta(panel, fuentes=self.fuentes, estilo="texto", fondo=COLOR_PANEL, color=COLOR_ACENTO, textvariable=self.estado_var, wraplength=330, justify="left", anchor="w").pack(fill="x", padx=16, pady=(0, 12))
+        self.crear.etiqueta(panel, fuentes=self.fuentes, estilo="estado", fondo=COLOR_PANEL, color=COLOR_ACENTO, textvariable=self.estado_var, wraplength=280, justify="center", anchor="center").pack(fill="both", expand=True, padx=12, pady=(2, 10))
 
-    def crear_espacio_imagen(self) -> None:
+    def crear_espacio_imagen(self):
         panel = self.crear.frame(self.fondo, fondo=COLOR_PANEL, borde=True)
-        panel.place(relx=0.385, rely=0.06, relwidth=0.58, relheight=0.88)
+        panel.place(relx=0.285, rely=0.06, relwidth=0.68, relheight=0.88)
+        panel.grid_columnconfigure(0, weight=1)
+        panel.grid_rowconfigure(0, weight=1, uniform="margen_mapa")
+        panel.grid_rowconfigure(2, weight=1, uniform="margen_mapa")
 
-    def crear_controles(self, panel) -> None:
+        encabezado = self.crear.frame(panel, fondo=COLOR_PANEL)
+        encabezado.grid(row=0, column=0, sticky="nsew")
+        self.crear.etiqueta(encabezado, "MODELO DEL LAGO VILLARRICA", fuentes=self.fuentes, estilo="titulo_mapa", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="center").pack(fill="both", expand=True)
+
+        contenedor_mapa = self.crear.frame(panel, fondo=COLOR_PANEL, height=500)
+        contenedor_mapa.grid(row=1, column=0, sticky="ew")
+        contenedor_mapa.pack_propagate(False)
+        self.panel_mapa = contenedor_mapa
+
+        pie = self.crear.frame(panel, fondo=COLOR_PANEL)
+        pie.grid(row=2, column=0, sticky="nsew")
+        self.crear.etiqueta(pie, f"PROPORCIÓN • 1u = {ESCALA:.3f}km • 1u² = {ESCALA_KM2:.6f}km²", fuentes=self.fuentes, estilo="proporcion", fondo=COLOR_PANEL, color=COLOR_ACENTO, anchor="center").pack(fill="both", expand=True)
+        panel.bind("<Configure>", lambda e: contenedor_mapa.configure(height=max(260, min(e.height - 120, int(e.width / 2)))))
+        self.mapa_calculo = MapaCalculo(self.panel_mapa)
+
+    def crear_controles(self, panel):
         controles = self.crear.frame(panel, fondo=COLOR_PANEL)
         controles.pack(fill="x", padx=16, pady=(0, 8))
         self.crear.etiqueta(controles, "n para suma de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x")
@@ -67,7 +84,7 @@ class VistaPrincipal:
         self.crear.boton(controles, "Calcular", self.tocar_boton_calcular.ejecutar, fuentes=self.fuentes).pack(fill="x", pady=(2, 0))
         self.marcar_n_seleccionado()
 
-    def crear_tarjetas(self, panel) -> None:
+    def crear_tarjetas(self, panel):
         tarjetas = [
             ("Curvas cubicas", "Pendiente\npresiona Calcular"),
             ("Area", "Riemann: pendiente\nIntegral: pendiente"),
@@ -78,12 +95,14 @@ class VistaPrincipal:
             tarjeta, etiqueta_valor = self.crear.tarjeta(panel, titulo=titulo, valor_inicial=valor, fuentes=self.fuentes)
             tarjeta.pack(fill="x", padx=16, pady=(0, 6))
             self.valores[titulo] = etiqueta_valor
+            if titulo == "Datos":
+                etiqueta_valor.configure(height=3)
 
-    def seleccionar_n(self, valor: int) -> None:
+    def seleccionar_n(self, valor):
         self.n_var.set(str(valor))
         self.marcar_n_seleccionado()
 
-    def marcar_n_seleccionado(self) -> None:
+    def marcar_n_seleccionado(self):
         for valor, boton in self.botones_n.items():
             activo = valor == self.n_var.get()
             boton.configure(bg=COLOR_ACENTO if activo else COLOR_BOTON, fg="#03101a" if activo else COLOR_TEXTO, activebackground=COLOR_ACENTO if activo else COLOR_BOTON_ACTIVO)
@@ -93,10 +112,11 @@ class TOCAR_BOTON_CALCULAR:
     def __init__(self, vista):
         self.vista = vista
 
-    def ejecutar(self) -> None:
+    def ejecutar(self):
         resultado = calcular_resultados(int(self.vista.n_var.get()))
         self.vista.ultimo_resultado = resultado
         self.vista.valores["Curvas cubicas"].configure(text=f"{resultado.curvas} curvas\n{resultado.curvas_por_lado} superiores + {resultado.curvas_por_lado} inferiores")
         self.vista.valores["Area"].configure(text=f"Riemann: {resultado.area_riemann_km2:.3f} km2\nIntegral: {resultado.area_integral_km2:.3f} km2")
-        self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\nerror integral {resultado.error_integral_pct:+.2f}%")
+        self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\nerror integral {resultado.error_integral_pct:+.2f}%\nerror Riemann {resultado.error_riemann_pct:+.2f}%")
         self.vista.estado_var.set(f"Calculo listo con n={resultado.n}.")
+        self.vista.mapa_calculo.mostrar_calculo_en_mapa(resultado.n)
