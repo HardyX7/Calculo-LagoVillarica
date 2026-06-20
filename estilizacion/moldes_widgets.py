@@ -6,23 +6,12 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import font
 from typing import Callable
-
 from PIL import Image, ImageTk
-
-RUTA_ESTILIZACION = Path(__file__).parent
-RUTA_FONDO = RUTA_ESTILIZACION / "MoldeFondo.png"
-
-COLOR_FONDO = "#030b15"
-COLOR_PANEL = "#061827"
-COLOR_PANEL_CLARO = "#0a2236"
-COLOR_BORDE = "#00c8ff"
-COLOR_TEXTO = "#eaf7ff"
-COLOR_TEXTO_SUAVE = "#93b7c7"
-COLOR_ACENTO = "#ffb45a"
-COLOR_BOTON = "#0d344f"
-COLOR_BOTON_ACTIVO = "#144a70"
-COLOR_BARRA = "#05131f"
-
+from constantes import (
+    RUTA_FONDO, COLOR_BORDE, COLOR_PANEL_CLARO,
+    COLOR_BOTON, COLOR_BOTON_ACTIVO, COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, 
+    COLOR_TEXTO_SUAVE, RUTA_FONDO
+)
 
 class FondoEscalable(tk.Canvas):
     """Canvas base para mostrar la imagen de fondo ajustada a la ventana."""
@@ -118,7 +107,7 @@ class MoldeBoton(tk.Button):
         )
 
 
-class Crear:
+class CrearWidget:
     """Fabrica unica para crear widgets desde la vista."""
 
     def fuentes(self, root: tk.Tk) -> dict[str, font.Font]:

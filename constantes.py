@@ -38,3 +38,21 @@ COLOR_MAPA_NORTE = "#ffb45a"
 COLOR_MAPA_SUR = "#eaf7ff"
 COLOR_MAPA_AREA = "#00c8ff"
 COLOR_MAPA_LEYENDA = "#0a2236"
+
+
+from pathlib import Path
+
+RUTA_IMAGENES = Path(__file__).parent / "images"
+print(RUTA_IMAGENES)
+RUTA_FONDO = RUTA_IMAGENES / "MoldeFondo.png"
+
+COLOR_FONDO = "#030b15"
+COLOR_PANEL = "#061827"
+COLOR_PANEL_CLARO = "#0a2236"
+COLOR_BORDE = "#00c8ff"
+COLOR_TEXTO = "#eaf7ff"
+COLOR_TEXTO_SUAVE = "#93b7c7"
+COLOR_ACENTO = "#ffb45a"
+COLOR_BOTON = "#0d344f"
+COLOR_BOTON_ACTIVO = "#144a70"
+COLOR_BARRA = "#05131f"

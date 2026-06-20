@@ -1,14 +1,20 @@
-"""Vista principal: controles y resultados."""
-
 import tkinter as tk
-
-from estilizacion.moldes_widgets import COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO, COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, COLOR_TEXTO_SUAVE, Crear
-from constantes import AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2
+from estilizacion.moldes_widgets import  CrearWidget
 from mapa.mapa_calculo import MapaCalculo
-from resultados_lago import calcular_resultados
-
+from resultados_lago import CalcularResultados
+from functions.funciones import f, g
+from constantes import (
+    AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2,
+    COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO,
+    COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, COLOR_TEXTO_SUAVE, INTERVALO
+)
 
 class VistaPrincipal:
+    
+    """
+    Vista principal: controles y resultados.
+    """
+    
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Modelo Lago Villarrica - Riemann e integral")
@@ -17,12 +23,12 @@ class VistaPrincipal:
         self.root.attributes("-fullscreen", True)
         self.root.bind("<Escape>", lambda _event: self.root.attributes("-fullscreen", False))
         self.root.configure(bg=COLOR_FONDO)
-
-        self.crear = Crear()
+        
+        self.crear = CrearWidget()
         self.fuentes = self.crear.fuentes(self.root)
         self.fondo = self.crear.fondo(self.root)
         self.fondo.pack(fill="both", expand=True)
-
+        
         self.n_var = tk.StringVar(value="15")
         self.estado_var = tk.StringVar(value="Elige n y presiona Calcular.")
         self.valores = {}
@@ -41,7 +47,7 @@ class VistaPrincipal:
         panel.place(relx=0.03, rely=0.06, relwidth=0.21, relheight=0.88)
 
         self.crear.etiqueta(panel, "Lago Villarrica\nmodelo de calculo", fuentes=self.fuentes, estilo="titulo", fondo=COLOR_PANEL, color=COLOR_TEXTO, justify="left", anchor="w").pack(fill="x", padx=16, pady=(14, 2))
-        self.crear.etiqueta(panel, "Area por Riemann e integral", fuentes=self.fuentes, estilo="subtitulo", fondo=COLOR_PANEL, color=COLOR_TEXTO_SUAVE, justify="left", wraplength=330, anchor="w").pack(fill="x", padx=16, pady=(0, 10))
+        self.crear.etiqueta(panel, "Área por Riemann e integral", fuentes=self.fuentes, estilo="subtitulo", fondo=COLOR_PANEL, color=COLOR_TEXTO_SUAVE, justify="left", wraplength=330, anchor="w").pack(fill="x", padx=16, pady=(0, 10))
 
         self.crear_controles(panel)
         self.crear_tarjetas(panel)
@@ -113,7 +119,7 @@ class TOCAR_BOTON_CALCULAR:
         self.vista = vista
 
     def ejecutar(self):
-        resultado = calcular_resultados(int(self.vista.n_var.get()))
+        resultado = CalcularResultados(f, g, INTERVALO, int(self.vista.n_var.get())).calcular()
         self.vista.ultimo_resultado = resultado
         self.vista.valores["Curvas cubicas"].configure(text=f"{resultado.curvas} curvas\n{resultado.curvas_por_lado} superiores + {resultado.curvas_por_lado} inferiores")
         self.vista.valores["Area"].configure(text=f"Riemann: {resultado.area_riemann_km2:.3f} km2\nIntegral: {resultado.area_integral_km2:.3f} km2")
