@@ -6,15 +6,13 @@ from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
 
 class CalcularCoordenadaYCentroide:
     """
-    Clase que calcula la coordenada y del centroide de la región entre dos curvas f y g.
-    La coordenada y se calcula como:
-        y_bar = (1/(2*A)) * ∫_a^b [f(x)^2 - g(x)^2] dx
-    donde A es el área entre las curvas f y g en el intervalo [a, b].
-
+    Calcula la coordenada y del centroide de la región entre dos curvas f y g.
+    
     Uso:
-        - calculadora = CalcularCoordenadaYCentroide(f, g, intervalo)
-        - y_centroide = calculadora.calcular()
-
+    
+    - from centroide.calcular_coordenada_y import CalcularCoordenadaYCentroide
+    - posicion_y = CalcularCoordenadaYCentroide(f, g, intervalo).calcular()
+    
     Donde:
         - f: la curva superior, debe ser una FuncionPorTramos
         - g: la curva inferior, debe ser una FuncionPorTramos

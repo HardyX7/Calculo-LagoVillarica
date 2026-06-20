@@ -4,13 +4,29 @@ from scipy.integrate import quad
 from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
 
 class CalcularCoordenadaXCentroide:
+    
+    """
+    Calcula la coordenada x del centroide de la región entre dos curvas f y g.
+    Uso:
+    
+    - from centroide.calcular_coordenada_x import CalcularCoordenadaXCentroide
+    - posicion_x = CalcularCoordenadaXCentroide(f, g, intervalo).calcular()
+    
+    Donde:
+    
+    - f: la curva superior, debe ser una FuncionPorTramos
+    - g: la curva inferior, debe ser una FuncionPorTramos
+    - intervalo: una tupla (a, b) que indica el intervalo de integración
+    """
+    
+    
     def __init__(
             self,
             f: FuncionPorTramos,
             g: FuncionPorTramos,
             intervalo: Tuple[float, float]
         ) -> None:
-
+        
         self.f = f
         self.g = g
         self.intervalo = intervalo
