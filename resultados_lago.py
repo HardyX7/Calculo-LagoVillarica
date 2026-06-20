@@ -12,6 +12,8 @@ from functions.funciones import f, g
 from functions.funcion_por_tramos import FuncionPorTramos
 from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
 from constantes import AREA_REFERENCIA_KM2, INTERVALO
+from centroide.calcular_centroide import CalcularCentroide
+
 
 punto_medio = PuntoMedio()
 
@@ -30,6 +32,8 @@ class ResultadoLago:
     area_integral_km2: float
     error_riemann_pct: float
     error_integral_pct: float
+    centroide_x: float
+    centroide_y: float
 
 class CalcularResultados:
     
@@ -82,6 +86,7 @@ class CalcularResultados:
         area_riemann_km2 = AreaEntreCurvasRiemann(self.f, self.g, self.n, punto_medio).area_escalada(self.intervalo)
         area_integral_km2 = AreaEntreCurvasIntegral(self.f, self.g).area_escalada(self.intervalo)
         curvas = len(self.f.tramos) + len(self.g.tramos)
+        centroide_x, centroide_y = CalcularCentroide(self.f, self.g, self.intervalo).calcular()
         return ResultadoLago(
             n=self.n,
             curvas=curvas,
@@ -90,6 +95,8 @@ class CalcularResultados:
             area_integral_km2=area_integral_km2,
             error_riemann_pct=100 * (area_riemann_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
             error_integral_pct=100 * (area_integral_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
+            centroide_x=centroide_x,
+            centroide_y=centroide_y,
         )
 
 """
