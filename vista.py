@@ -3,8 +3,9 @@ from estilizacion.moldes_widgets import  CrearWidget
 from mapa.mapa_calculo import MapaCalculo
 from resultados_lago import CalcularResultados
 from functions.funciones import f, g
+from Area.metodos_riemann import PuntoMedio, ExtremoIzquierdo, ExtremoDerecho
 from constantes import (
-    AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2,
+    AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2, COLOR_BORDE,
     COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO,
     COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, COLOR_TEXTO_SUAVE, INTERVALO
 )
@@ -30,6 +31,7 @@ class VistaPrincipal:
         self.fondo.pack(fill="both", expand=True)
         
         self.n_var = tk.StringVar(value="15")
+        self.metodo_riemann_var = tk.StringVar(value="Punto medio")
         self.estado_var = tk.StringVar(value="Elige n y presiona Calcular.")
         self.valores = {}
         self.ultimo_resultado = None
@@ -73,23 +75,48 @@ class VistaPrincipal:
         pie.grid(row=2, column=0, sticky="nsew")
         self.crear.etiqueta(pie, f"PROPORCIÓN • 1u = {ESCALA:.3f}km • 1u² = {ESCALA_KM2:.6f}km²", fuentes=self.fuentes, estilo="proporcion", fondo=COLOR_PANEL, color=COLOR_ACENTO, anchor="center").pack(fill="both", expand=True)
         panel.bind("<Configure>", lambda e: contenedor_mapa.configure(height=max(260, min(e.height - 120, int(e.width / 2)))))
+        
         self.mapa_calculo = MapaCalculo(self.panel_mapa)
 
     def crear_controles(self, panel):
-        controles = self.crear.frame(panel, fondo=COLOR_PANEL)
-        controles.pack(fill="x", padx=16, pady=(0, 8))
-        self.crear.etiqueta(controles, "n para suma de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x")
+        controles = self.crear.frame(
+            panel,
+            fondo=COLOR_PANEL
+        )
+        controles.pack(
+            side="top",
+            fill="x",
+            padx=16,
+            pady=(0, 8)
+        )
 
-        fila_n = self.crear.frame(controles, fondo=COLOR_PANEL)
-        fila_n.pack(fill="x", pady=(6, 8))
-        for n in (15, 30, 60, 100):
-            boton = self.crear.boton(fila_n, str(n), lambda valor=n: self.seleccionar_n(valor), fuentes=self.fuentes)
-            boton.pack(side="left", expand=True, fill="x", padx=(0, 6))
-            self.botones_n[str(n)] = boton
-
-        self.crear.boton(controles, "Calcular", self.tocar_boton_calcular.ejecutar, fuentes=self.fuentes).pack(fill="x", pady=(2, 0))
+        self.crear.etiqueta(controles, "n para suma de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x", pady=(0, 2))
+        
+        self.crear.deslizador(controles, desde=0, hasta=50, comando=lambda valor: self.seleccionar_n(valor), fuentes=self.fuentes, estilo_fuente="valor", fondo=COLOR_PANEL, color_barra=COLOR_BORDE).pack(fill="x", pady=(0, 10))
+        
+        self.crear.etiqueta(controles, "Metodo de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x", pady=(0, 2))
+        self.crear.desplegable(
+            controles,
+            self.metodo_riemann_var,
+            [
+                "Extremo izquierdo",
+                "Punto medio",
+                "Extremo derecho"
+            ],
+            fuentes=self.fuentes,
+            fondo=COLOR_BOTON,
+            fondo_activo=COLOR_BOTON_ACTIVO
+        ).pack(fill="x", pady=(0, 10))
+        
+        self.crear.boton(
+            controles,
+            "Calcular",
+            self.tocar_boton_calcular.ejecutar,
+            fuentes=self.fuentes
+        ).pack(fill="x")
+        
         self.marcar_n_seleccionado()
-
+    
     def crear_tarjetas(self, panel):
         tarjetas = [
             ("Curvas cubicas", "Pendiente\npresiona Calcular"),
@@ -118,9 +145,16 @@ class VistaPrincipal:
 class TOCAR_BOTON_CALCULAR:
     def __init__(self, vista):
         self.vista = vista
+        self.metodo_riemann = None
 
     def ejecutar(self):
-        resultado = CalcularResultados(f, g, INTERVALO, int(self.vista.n_var.get())).calcular()
+        if self.vista.metodo_riemann_var.get() == "Punto medio":
+            self.metodo_riemann = PuntoMedio()
+        elif self.vista.metodo_riemann_var.get() == "Extremo izquierdo":            
+            self.metodo_riemann = ExtremoIzquierdo()
+        elif self.vista.metodo_riemann_var.get() == "Extremo derecho":
+            self.metodo_riemann = ExtremoDerecho()
+        resultado = CalcularResultados(f, g, INTERVALO, int(self.vista.n_var.get()), self.metodo_riemann).calcular()
         self.vista.ultimo_resultado = resultado
         self.vista.valores["Curvas cubicas"].configure(text=f"{resultado.curvas} curvas\n{resultado.curvas_por_lado} superiores + {resultado.curvas_por_lado} inferiores")
         self.vista.valores["Area"].configure(text=f"Riemann: {resultado.area_riemann_km2:.3f} km2\nIntegral: {resultado.area_integral_km2:.3f} km2")
@@ -128,4 +162,4 @@ class TOCAR_BOTON_CALCULAR:
         self.vista.valores["Volumen"].configure()
         self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\nerror integral {resultado.error_integral_pct:+.2f}%\nerror Riemann {resultado.error_riemann_pct:+.2f}%")
         self.vista.estado_var.set(f"Calculo listo con n={resultado.n}.")
-        self.vista.mapa_calculo.mostrar_calculo_en_mapa(resultado.n)
+        self.vista.mapa_calculo.mostrar_calculo_en_mapa(resultado.n, self.vista.metodo_riemann_var.get())

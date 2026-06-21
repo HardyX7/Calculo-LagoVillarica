@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 from constantes import (
     RUTA_FONDO, COLOR_BORDE, COLOR_PANEL_CLARO,
     COLOR_BOTON, COLOR_BOTON_ACTIVO, COLOR_FONDO, COLOR_PANEL, COLOR_TEXTO, 
-    COLOR_TEXTO_SUAVE, RUTA_FONDO
+    COLOR_TEXTO_SUAVE
 )
 
 class FondoEscalable(tk.Canvas):
@@ -107,18 +107,104 @@ class MoldeBoton(tk.Button):
         )
 
 
+# --- NUEVO MOLDE PARA EL DESLIZADOR ---
+class MoldeDeslizador(tk.Scale):
+    """Molde estilizado y plano para controles deslizantes numéricos."""
+    
+    def __init__(
+        self,
+        master: tk.Misc,
+        *,
+        desde: int = 0,
+        hasta: int = 100,
+        comando: Callable[[str], None] | None = None,
+        fuentes: dict[str, font.Font],
+        estilo_fuente: str = "valor",
+        fondo: str = COLOR_PANEL,
+        color_barra: str = COLOR_BORDE,
+        **kwargs,
+    ):
+        super().__init__(
+            master,
+            from_=desde,
+            to=hasta,
+            command=comando,
+            orient=tk.HORIZONTAL,
+            resolution=1,                  # Forzado a enteros por defecto
+            bg=fondo,                      # Fondo del contenedor
+            fg=COLOR_TEXTO_SUAVE,          # Color de los números del intervalo
+            troughcolor=color_barra,       # Color de la línea/riel
+            activebackground=COLOR_BOTON_ACTIVO, # Color del botón al pasar el mouse
+            sliderrelief="flat",           # Estilo plano moderno sin 3D
+            bd=0,                          # Quita bordes de ventana antigua
+            highlightthickness=0,          # Elimina el recuadro de foco
+            font=fuentes[estilo_fuente],
+            **kwargs,
+        )
+
+class MoldeDesplegable(tk.OptionMenu):
+    """Menú desplegable estilizado y plano para selección de opciones."""
+
+    def __init__(
+        self,
+        master: tk.Misc,
+        variable: tk.StringVar,
+        opciones: list[str],
+        *,
+        fuentes: dict[str, font.Font],
+        comando: Callable[[str], None] | None = None,
+        fondo: str = COLOR_BOTON,
+        fondo_activo: str = COLOR_BOTON_ACTIVO,
+        **kwargs,
+    ):
+        
+        if not variable.get() and opciones:
+            variable.set(opciones[0])
+
+        super().__init__(
+            master,
+            variable,
+            *opciones,
+            command=comando,
+            **kwargs,
+        )
+        
+        self.configure(
+            bg=fondo,
+            fg=COLOR_TEXTO,
+            activebackground=fondo_activo,
+            activeforeground=COLOR_TEXTO,
+            relief="flat",
+            bd=0,
+            highlightthickness=0,
+            cursor="hand2",
+            font=fuentes["texto"],
+            padx=10,
+            pady=5,
+        )
+        
+        self["menu"].configure(
+            bg=COLOR_PANEL,
+            fg=COLOR_TEXTO,
+            activebackground=COLOR_BOTON_ACTIVO,
+            activeforeground=COLOR_TEXTO,
+            font=fuentes["texto"],
+            bd=1,
+            relief="flat"
+        )
+
 class CrearWidget:
     """Fabrica unica para crear widgets desde la vista."""
 
     def fuentes(self, root: tk.Tk) -> dict[str, font.Font]:
         return {
-            "titulo": font.Font(root, family="Segoe UI", size=24, weight="bold"),
-            "titulo_mapa": font.Font(root, family="Segoe UI", size=38, weight="bold"),
-            "proporcion": font.Font(root, family="Segoe UI", size=21, weight="bold"),
-            "estado": font.Font(root, family="Segoe UI", size=16, weight="bold"),
-            "subtitulo": font.Font(root, family="Segoe UI", size=10),
-            "etiqueta": font.Font(root, family="Segoe UI", size=10, weight="bold"),
-            "valor": font.Font(root, family="Consolas", size=13, weight="bold"),
+            "titulo": font.Font(root, family="Segoe UI", size=20, weight="bold"),
+            "titulo_mapa": font.Font(root, family="Segoe UI", size=34, weight="bold"),
+            "proporcion": font.Font(root, family="Segoe UI", size=17, weight="bold"),
+            "estado": font.Font(root, family="Segoe UI", size=12, weight="bold"),
+            "subtitulo": font.Font(root, family="Segoe UI", size=8),
+            "etiqueta": font.Font(root, family="Segoe UI", size=8, weight="bold"),
+            "valor": font.Font(root, family="Consolas", size=10, weight="bold"),
             "texto": font.Font(root, family="Segoe UI", size=9),
             "boton": font.Font(root, family="Segoe UI", size=10, weight="bold"),
         }
@@ -175,6 +261,54 @@ class CrearWidget:
             comando,
             fuentes=fuentes,
             pequeno=pequeno,
+            fondo=fondo,
+            fondo_activo=fondo_activo,
+            **kwargs,
+        )
+
+    def deslizador(
+        self,
+        master: tk.Misc,
+        *,
+        desde: int = 0,
+        hasta: int = 100,
+        comando: Callable[[str], None] | None = None,
+        fuentes: dict[str, font.Font],
+        estilo_fuente: str = "valor",
+        fondo: str = COLOR_PANEL,
+        color_barra: str = COLOR_BORDE,
+        **kwargs,
+    ) -> MoldeDeslizador:
+        return MoldeDeslizador(
+            master,
+            desde=desde,
+            hasta=hasta,
+            comando=comando,
+            fuentes=fuentes,
+            estilo_fuente=estilo_fuente,
+            fondo=fondo,
+            color_barra=color_barra,
+            **kwargs,
+        )
+    
+    def desplegable(
+        self,
+        master: tk.Misc,
+        variable: tk.StringVar,
+        opciones: list[str],
+        *,
+        fuentes: dict[str, font.Font],
+        comando: Callable[[str], None] | None = None,
+        fondo: str = COLOR_BOTON,
+        fondo_activo: str = COLOR_BOTON_ACTIVO,
+        **kwargs,
+    ) -> MoldeDesplegable:
+        return MoldeDesplegable(
+            master,
+            variable=variable,
+            opciones=opciones,
+            fuentes=fuentes,
+            comando=comando,
             fondo=fondo,
             fondo_activo=fondo_activo,
             **kwargs,
