@@ -15,6 +15,7 @@ from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
 from constantes import AREA_REFERENCIA_KM2, INTERVALO
 from centroide.calcular_centroide import CalcularCentroide
 from Volumen.volumen_elipse import VolumenElipse
+from Volumen.volumen_funciones import VolumenEntreCurvas
 
 
 punto_medio = PuntoMedio()
@@ -38,6 +39,8 @@ class ResultadoLago:
     centroide_x: float
     centroide_y: float
     volumen_elipse: float
+    volumen_funciones: float
+
 
 class CalcularResultados:
     
@@ -96,6 +99,7 @@ class CalcularResultados:
         curvas = len(self.f.tramos) + len(self.g.tramos)
         centroide_x, centroide_y = CalcularCentroide(self.f, self.g, self.intervalo).calcular()
         volumen_elipse = VolumenElipse(elipse)
+        volumen_funciones = VolumenEntreCurvas(AreaEntreCurvasIntegral(f, g))
         return ResultadoLago(
             n=self.n,
             curvas=curvas,
@@ -107,7 +111,8 @@ class CalcularResultados:
             error_integral_pct=100 * (area_integral_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
             centroide_x=centroide_x,
             centroide_y=centroide_y,
-            volumen_elipse= volumen_elipse(120)
+            volumen_elipse= volumen_elipse(120),
+            volumen_funciones = volumen_funciones(self.intervalo, 0.12)
         )
 
 """
