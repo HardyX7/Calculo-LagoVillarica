@@ -15,7 +15,11 @@ ESCALA = escala_lago.factor
 La escala al cuadrado, para convertir áreas del grafico a km2.
 """
 ESCALA_KM2 = escala_lago.aplicar(ESCALA)
-
+""""""""""
+escala de metros a km
+"""""""""""
+KM2_A_M2 = 1_000_000
+M2_A_KM2 = 1000000000
 """
 Intervalo de integración para el cálculo del área entre las curvas f y g.
 """

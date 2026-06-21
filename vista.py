@@ -122,7 +122,7 @@ class VistaPrincipal:
             ("Curvas cubicas", "Pendiente\npresiona Calcular"),
             ("Area", "Riemann: pendiente\nIntegral: pendiente"),
             ("Centroide", "Ubicación: pendiente"),
-            ("Volumen", "Volumen: pendiente"),
+            ("Volumen", "Volumen (Elipse): pendiente"),
             ("Datos", f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\npendiente"),
         ]
         for titulo, valor in tarjetas:
@@ -159,7 +159,7 @@ class TOCAR_BOTON_CALCULAR:
         self.vista.valores["Curvas cubicas"].configure(text=f"{resultado.curvas} curvas\n{resultado.curvas_por_lado} superiores + {resultado.curvas_por_lado} inferiores")
         self.vista.valores["Area"].configure(text=f"Riemann: {resultado.area_riemann_km2:.3f} km2\nIntegral: {resultado.area_integral_km2:.3f} km2")
         self.vista.valores["Centroide"].configure(text=f"Ubicación: X = {resultado.centroide_x:.2f} KM\nY = {resultado.centroide_y:.2f} KM")
-        self.vista.valores["Volumen"].configure()
+        self.vista.valores["Volumen"].configure(text = f"Valumen (Elipse): {resultado.volumen_elipse: .2f} KM3") 
         self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\nerror integral {resultado.error_integral_pct:+.2f}%\nerror Riemann {resultado.error_riemann_pct:+.2f}%")
         self.vista.estado_var.set(f"Calculo listo con n={resultado.n}.")
         self.vista.mapa_calculo.mostrar_calculo_en_mapa(resultado.n, self.vista.metodo_riemann_var.get())

@@ -1,5 +1,6 @@
 from functions.polinomio_grado_tres import PolinomioGradoTres
 from functions.funcion_por_tramos import FuncionPorTramos
+from functions.funcion_elipse import Elipse
 
 """
 Funciones f y g que modelan el contorno del lago Villarica, donde f corresponde al contorno norte y g al 
@@ -49,3 +50,6 @@ g.agregar_tramo(3.53, PolinomioGradoTres(-0.133677, 1.21888, -3.126997, 4.64))
 g.agregar_tramo(10.75, PolinomioGradoTres(-0.016647, 0.353668, -2.468833, 7.95023))
 g.agregar_tramo(19.81, PolinomioGradoTres(-0.002032, 0.096148, -1.650198, 10.752381))
 g.agregar_tramo(30, PolinomioGradoTres(0.015282, -0.999939, 21.990029, -162.01717))
+
+elipse = Elipse(15, 7.5, 15, 7.5)
+

@@ -20,7 +20,7 @@ class Integral:
     
     def __init__(
             self,
-            funcion: FuncionPorTramos,
+            funcion
         ) -> None:
         
         self.funcion = funcion
