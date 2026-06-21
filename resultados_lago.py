@@ -12,10 +12,10 @@ from functions.funciones import f, g, elipse
 from functions.funcion_por_tramos import FuncionPorTramos
 from Area.metodos_riemann import MetodoRiemann
 from Area.area_entre_curvas_integral import AreaEntreCurvasIntegral
+from Area.Integral import Integral
 from constantes import AREA_REFERENCIA_KM2, INTERVALO
 from centroide.calcular_centroide import CalcularCentroide
-from Volumen.volumen_elipse import VolumenElipse
-from Volumen.volumen_funciones import VolumenEntreCurvas
+from Volumen.volumen import Volumen
 
 
 punto_medio = PuntoMedio()
@@ -98,8 +98,9 @@ class CalcularResultados:
         area_integral_km2 = AreaEntreCurvasIntegral(self.f, self.g).area_escalada(self.intervalo)
         curvas = len(self.f.tramos) + len(self.g.tramos)
         centroide_x, centroide_y = CalcularCentroide(self.f, self.g, self.intervalo).calcular()
-        volumen_elipse = VolumenElipse(elipse)
-        volumen_funciones = VolumenEntreCurvas(AreaEntreCurvasIntegral(f, g))
+        volumen_elipse = Volumen(Integral(elipse))
+        volumen_funciones = Volumen(AreaEntreCurvasIntegral(f, g))
+        intervalo_elipse = (elipse.h - elipse.a, elipse.h + elipse.a)#le paso el intervalo
         return ResultadoLago(
             n=self.n,
             curvas=curvas,
@@ -111,7 +112,7 @@ class CalcularResultados:
             error_integral_pct=100 * (area_integral_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
             centroide_x=centroide_x,
             centroide_y=centroide_y,
-            volumen_elipse= volumen_elipse(120),
+            volumen_elipse=volumen_elipse(intervalo_elipse, 0.12),
             volumen_funciones = volumen_funciones(self.intervalo, 0.12)
         )
 

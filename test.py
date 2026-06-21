@@ -5,6 +5,7 @@ from Area.metodos_riemann import PuntoMedio
 from constantes import AREA_REFERENCIA_KM2, INTERVALO, ESCALA_KM2, ESCALA
 from centroide.calcular_centroide import CalcularCentroide
 
+
 print("Resultados del modelo del Lago Villarrica:")
 print(f"Area por Riemann (n=15): {AreaEntreCurvasRiemann(f, g, 15, PuntoMedio()).area_escalada(INTERVALO):.3f} km2")
 print(f"Area por Riemann (n=30): {AreaEntreCurvasRiemann(f, g, 30, PuntoMedio()).area_escalada(INTERVALO):.3f} km2")
@@ -14,6 +15,8 @@ print(f"Area por Integral: {AreaEntreCurvasIntegral(f, g).area_escalada(INTERVAL
 calculadora = CalcularCentroide(f, g, INTERVALO)
 centroide = calculadora.calcular()  # Devuelve (x, y)
 print(f"Centroide: {centroide}")
+
+
 
 print(ESCALA, ESCALA_KM2)
 import tkinter as tk
