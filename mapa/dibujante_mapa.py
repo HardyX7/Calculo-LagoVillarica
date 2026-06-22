@@ -27,9 +27,9 @@ class DibujanteMapa:
         # Las curvas se agregan una sola vez durante el primer calculo.
         if self.ejes.lines:
             return
-        self.ejes.fill_between(datos.x, datos.sur, datos.norte, color=COLOR_MAPA_AREA, alpha=0.18, label="Area integral")
-        self.ejes.plot(datos.x, datos.norte, color=COLOR_MAPA_NORTE, linewidth=2, label="f(x) norte")
-        self.ejes.plot(datos.x, datos.sur, color=COLOR_MAPA_SUR, linewidth=2, label="g(x) sur")
+        self.ejes.fill_between(datos.x, datos.sur, datos.norte, color=COLOR_MAPA_AREA, alpha=0.18, label="Área integral")
+        self.ejes.plot(datos.x, datos.norte, color=COLOR_MAPA_NORTE, linewidth=2, label="f(x)")
+        self.ejes.plot(datos.x, datos.sur, color=COLOR_MAPA_SUR, linewidth=2, label="g(x)")
         self.ejes.legend(facecolor=COLOR_MAPA_LEYENDA, labelcolor=COLOR_MAPA_SUR, loc="upper right")
 
     def dibujar_riemann(self, rectangulos):

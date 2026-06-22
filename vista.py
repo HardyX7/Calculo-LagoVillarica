@@ -4,6 +4,7 @@ from mapa.mapa_calculo import MapaCalculo
 from resultados_lago import CalcularResultados
 from functions.funciones import f, g
 from Area.metodos_riemann import PuntoMedio, ExtremoIzquierdo, ExtremoDerecho
+from calculadora_curvas_polinomicas import CalculadoraCurvasPolinomicas
 from constantes import (
     AREA_REFERENCIA_KM2, ESCALA, ESCALA_KM2, COLOR_BORDE,
     COLOR_ACENTO, COLOR_BOTON, COLOR_BOTON_ACTIVO,
@@ -11,11 +12,11 @@ from constantes import (
 )
 
 class VistaPrincipal:
-    
+
     """
     Vista principal: controles y resultados.
     """
-    
+
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Modelo Lago Villarrica - Riemann e integral")
@@ -24,12 +25,12 @@ class VistaPrincipal:
         self.root.attributes("-fullscreen", True)
         self.root.bind("<Escape>", lambda _event: self.root.attributes("-fullscreen", False))
         self.root.configure(bg=COLOR_FONDO)
-        
+
         self.crear = CrearWidget()
         self.fuentes = self.crear.fuentes(self.root)
         self.fondo = self.crear.fondo(self.root)
         self.fondo.pack(fill="both", expand=True)
-        
+
         self.n_var = tk.StringVar(value="15")
         self.metodo_riemann_var = tk.StringVar(value="Punto medio")
         self.estado_var = tk.StringVar(value="Elige n y presiona Calcular.")
@@ -37,6 +38,7 @@ class VistaPrincipal:
         self.ultimo_resultado = None
         self.botones_n = {}
         self.tocar_boton_calcular = TOCAR_BOTON_CALCULAR(self)
+        self.calculadora = None  # instancia de la calculadora de curvas
 
         self.crear_panel_resultados()
         self.crear_espacio_imagen()
@@ -75,7 +77,7 @@ class VistaPrincipal:
         pie.grid(row=2, column=0, sticky="nsew")
         self.crear.etiqueta(pie, f"PROPORCIÓN • 1u = {ESCALA:.3f}km • 1u² = {ESCALA_KM2:.6f}km²", fuentes=self.fuentes, estilo="proporcion", fondo=COLOR_PANEL, color=COLOR_ACENTO, anchor="center").pack(fill="both", expand=True)
         panel.bind("<Configure>", lambda e: contenedor_mapa.configure(height=max(260, min(e.height - 120, int(e.width / 2)))))
-        
+
         self.mapa_calculo = MapaCalculo(self.panel_mapa)
 
     def crear_controles(self, panel):
@@ -91,9 +93,9 @@ class VistaPrincipal:
         )
 
         self.crear.etiqueta(controles, "n para suma de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x", pady=(0, 2))
-        
+
         self.crear.deslizador(controles, desde=0, hasta=50, comando=lambda valor: self.seleccionar_n(valor), fuentes=self.fuentes, estilo_fuente="valor", fondo=COLOR_PANEL, color_barra=COLOR_BORDE).pack(fill="x", pady=(0, 10))
-        
+
         self.crear.etiqueta(controles, "Metodo de Riemann", fuentes=self.fuentes, estilo="etiqueta", fondo=COLOR_PANEL, color=COLOR_TEXTO, anchor="w").pack(fill="x", pady=(0, 2))
         self.crear.desplegable(
             controles,
@@ -107,30 +109,42 @@ class VistaPrincipal:
             fondo=COLOR_BOTON,
             fondo_activo=COLOR_BOTON_ACTIVO
         ).pack(fill="x", pady=(0, 10))
-        
+
         self.crear.boton(
             controles,
             "Calcular",
             self.tocar_boton_calcular.ejecutar,
             fuentes=self.fuentes
         ).pack(fill="x")
-        
+
         self.marcar_n_seleccionado()
-    
+
     def crear_tarjetas(self, panel):
         tarjetas = [
-            ("Curvas cubicas", "Pendiente\npresiona Calcular"),
-            ("Area", "Riemann: pendiente\nIntegral: pendiente"),
-            ("Centroide", "Ubicación: pendiente"),
-            ("Volumen", "Volumen (Elipse): pendiente"),
-            ("Datos", f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\npendiente"),
+            ("Curvas cubicas", "Pendiente\npresiona Calcular", self.abrir_calculadora),
+            ("Area", "Riemann: pendiente\nIntegral: pendiente", None),
+            ("Centroide", "Ubicación: pendiente", None),
+            ("Volumen", "Volumen (Elipse): pendiente", None),
+            ("Datos", f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\npendiente", None),
         ]
-        for titulo, valor in tarjetas:
-            tarjeta, etiqueta_valor = self.crear.tarjeta(panel, titulo=titulo, valor_inicial=valor, fuentes=self.fuentes)
+        for titulo, valor, comando in tarjetas:
+            tarjeta, etiqueta_valor = self.crear.tarjeta(
+                panel,
+                titulo=titulo,
+                valor_inicial=valor,
+                fuentes=self.fuentes,
+                comando_profundizar=comando,
+            )
             tarjeta.pack(fill="x", padx=16, pady=(0, 6))
             self.valores[titulo] = etiqueta_valor
             if titulo == "Datos":
                 etiqueta_valor.configure(height=3)
+
+    def abrir_calculadora(self):
+        """Abrir la ventana de interpolación de curvas cúbicas."""
+        if self.calculadora is None or not self.calculadora.top.winfo_exists():
+            self.calculadora = CalculadoraCurvasPolinomicas(self.root)
+        self.calculadora.mostrar()
 
     def seleccionar_n(self, valor):
         self.n_var.set(str(valor))
@@ -150,7 +164,7 @@ class TOCAR_BOTON_CALCULAR:
     def ejecutar(self):
         if self.vista.metodo_riemann_var.get() == "Punto medio":
             self.metodo_riemann = PuntoMedio()
-        elif self.vista.metodo_riemann_var.get() == "Extremo izquierdo":            
+        elif self.vista.metodo_riemann_var.get() == "Extremo izquierdo":
             self.metodo_riemann = ExtremoIzquierdo()
         elif self.vista.metodo_riemann_var.get() == "Extremo derecho":
             self.metodo_riemann = ExtremoDerecho()
@@ -158,8 +172,8 @@ class TOCAR_BOTON_CALCULAR:
         self.vista.ultimo_resultado = resultado
         self.vista.valores["Curvas cubicas"].configure(text=f"{resultado.curvas} curvas\n{resultado.curvas_por_lado} superiores + {resultado.curvas_por_lado} inferiores")
         self.vista.valores["Area"].configure(text=f"Riemann: {resultado.area_riemann_km2:.3f} km2\nIntegral: {resultado.area_integral_km2:.3f} km2")
-        self.vista.valores["Centroide"].configure(text=f"Ubicación: X = {resultado.centroide_x:.2f} KM\nY = {resultado.centroide_y:.2f} KM")
-        self.vista.valores["Volumen"].configure(text = f"Volumen (funciones): {resultado.volumen_funciones: .2f} KM3\nValumen (Elipse): {resultado.volumen_elipse: .2f} KM3") 
-        self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km2\nerror integral {resultado.error_integral_pct:+.2f}%\nerror Riemann {resultado.error_riemann_pct:+.2f}%")
-        self.vista.estado_var.set(f"Calculo listo con n={resultado.n}.")
+        self.vista.valores["Centroide"].configure(text=f"Ubicación: ({resultado.centroide_x:.2f}, {resultado.centroide_y:.2f})")
+        self.vista.valores["Volumen"].configure(text = f"Volumen (funciones): {resultado.volumen_funciones: .2f} Km³\nVolumen (Elipse): {resultado.volumen_elipse: .2f} Km³")
+        self.vista.valores["Datos"].configure(text=f"Referencia: {AREA_REFERENCIA_KM2:.1f} km²\nerror integral {resultado.error_integral_pct:+.2f}%\nerror Riemann {resultado.error_riemann_pct:+.2f}%")
+        self.vista.estado_var.set(f"Cálculo listo con n={resultado.n}.")
         self.vista.mapa_calculo.mostrar_calculo_en_mapa(resultado.n, self.vista.metodo_riemann_var.get())
