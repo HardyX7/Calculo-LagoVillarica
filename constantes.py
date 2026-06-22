@@ -9,7 +9,7 @@ equivale a 0.766666666666667 km en la realidad.
 """
 from mapa.escala import escala_lago
 
-ESCALA = escala_lago.factor
+ESCALA = int(escala_lago.factor)
 
 """
 La escala al cuadrado, para convertir áreas del grafico a km2.
@@ -23,7 +23,7 @@ M2_A_KM2 = 1000000000
 """
 Intervalo de integración para el cálculo del área entre las curvas f y g.
 """
-INTERVALO = (0, 30)
+INTERVALO = (0, 22.5)
 
 """
 Area de referencia para el lago Villarrica, según la Ilustre Municipalidad de Villarrica.

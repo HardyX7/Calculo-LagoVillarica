@@ -17,4 +17,4 @@ class Escala:
 
 
 # Escala especifica utilizada por el modelo del Lago Villarrica.
-escala_lago = Escala(factor=0.766)
+escala_lago = Escala(factor=1)

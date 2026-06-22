@@ -40,16 +40,18 @@ están definidas solo para ese rango. Si se intenta evaluar fuera del dominio, s
 """
 
 f = FuncionPorTramos("f")
-f.agregar_tramo(3.53, PolinomioGradoTres(0.129235, -0.987254, 2.653156, 4.64))
-f.agregar_tramo(10.75, PolinomioGradoTres(0.041567, -1.209839, 11.261291, -19.115071))
-f.agregar_tramo(19.81, PolinomioGradoTres(-0.023132, 1.035955, -15.013535, 84.18492))
-f.agregar_tramo(30, PolinomioGradoTres(-0.00214, 0.163131, -4.393378, 53.134089))
+f.agregar_tramo(2.44, PolinomioGradoTres(0.20149, -1.078911, 2.334591, 3.42))
+f.agregar_tramo(6.47, PolinomioGradoTres(0.116694, -2.156136, 13.096991, -15.195071))
+f.agregar_tramo(10.5, PolinomioGradoTres(0.031336, -0.794419, 6.325312, -5.266804))
+f.agregar_tramo(14.77, PolinomioGradoTres(-0.051494, 1.725714, -18.651005, 75.026711))
+f.agregar_tramo(22.5, PolinomioGradoTres(-0.00186, 0.096355, -1.919372, 23.421961))
 
 g = FuncionPorTramos("g")
-g.agregar_tramo(3.53, PolinomioGradoTres(-0.133677, 1.21888, -3.126997, 4.64))
-g.agregar_tramo(10.75, PolinomioGradoTres(-0.016647, 0.353668, -2.468833, 7.95023))
-g.agregar_tramo(19.81, PolinomioGradoTres(-0.002032, 0.096148, -1.650198, 10.752381))
-g.agregar_tramo(30, PolinomioGradoTres(0.015282, -0.999939, 21.990029, -162.01717))
+g.agregar_tramo(2.44, PolinomioGradoTres(-0.217752, 1.543509, -2.998444, 3.42))
+g.agregar_tramo(6.47, PolinomioGradoTres(-0.088105, 1.208477, -5.285527, 9.11178))
+g.agregar_tramo(10.5, PolinomioGradoTres(0.088073, -2.045153, 15.29131, -35.536636))
+g.agregar_tramo(14.77, PolinomioGradoTres(-0.086657, 3.353787, -43.204039, 185.703326))
+g.agregar_tramo(22.5, PolinomioGradoTres(0.039951, -2.044563, 34.996752, -199.6006764))
 
 elipse = Elipse(15, 7.5, 15, 7.5)
 

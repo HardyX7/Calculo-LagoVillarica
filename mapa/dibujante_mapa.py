@@ -15,8 +15,8 @@ class DibujanteMapa:
         a, b = intervalo
         self.ejes.set_position((0.035, 0.045, 0.95, 0.94))
         self.ejes.set_facecolor(COLOR_MAPA_FONDO)
-        self.ejes.imshow(imagen, extent=(a, b, 0, 15), origin="upper", aspect="equal", alpha=0.82)
-        self.ejes.set(xlim=(a, b), ylim=(0, 15))
+        self.ejes.imshow(imagen, extent=(a, b, 0, 11.2), origin="upper", aspect="equal", alpha=0.82)
+        self.ejes.set(xlim=(a, b), ylim=(0, 11.2))
         self.ejes.set_aspect("equal", adjustable="box")
         self.ejes.tick_params(colors=COLOR_MAPA_SUR, labelsize=9)
         self.ejes.grid(color=COLOR_MAPA_SUR, linestyle=":", alpha=0.18)
