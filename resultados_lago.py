@@ -100,7 +100,6 @@ class CalcularResultados:
         centroide_x, centroide_y = CalcularCentroide(self.f, self.g, self.intervalo).calcular()
         volumen_elipse = Volumen(Integral(elipse))
         volumen_funciones = Volumen(AreaEntreCurvasIntegral(f, g))
-        intervalo_elipse = (elipse.h - elipse.a, elipse.h + elipse.a)#le paso el intervalo
         return ResultadoLago(
             n=self.n,
             curvas=curvas,
@@ -112,7 +111,7 @@ class CalcularResultados:
             error_integral_pct=100 * (area_integral_km2 - AREA_REFERENCIA_KM2) / AREA_REFERENCIA_KM2,
             centroide_x=centroide_x,
             centroide_y=centroide_y,
-            volumen_elipse=volumen_elipse(intervalo_elipse, 0.12),
+            volumen_elipse=volumen_elipse(elipse.intervalo, 0.12),
             volumen_funciones = volumen_funciones(self.intervalo, 0.12)
         )
 

@@ -30,6 +30,12 @@ class Elipse:
         self.a = a
         self.b = b
 
+    @property
+    def intervalo(self) -> tuple[float, float]:
+        """Devuelve el intervalo horizontal en el que existe la elipse."""
+
+        return (self.h - self.a, self.h + self.a)
+
     def y_superior(self, x: float) -> float:
         
         """

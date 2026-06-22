@@ -3,6 +3,8 @@ class Volumen:
 
     El calculador de area debe implementar ``area_escalada(intervalo)`` y
     devolver km2. La altura se recibe en km y el volumen se devuelve en km3.
+    Es un caso particular de secciones transversales, que al tener una profundidad constrante solo es necesario
+    integrar para obtener area y multiplicarlo por la altura.
     """
 
     def __init__(self, calculador_area):
