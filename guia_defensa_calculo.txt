@@ -1,0 +1,819 @@
+GUÍA COMPLETA PARA LA MINI DEFENSA
+PROYECTO: MEDICIONES SOBRE EL LAGO VILLARRICA
+
+======================================================================
+1. IDEA GENERAL DEL PROYECTO
+======================================================================
+
+El objetivo fue transformar el contorno irregular del Lago Villarrica en
+un modelo matemático que permitiera calcular:
+
+- Su área superficial.
+- Un volumen aproximado.
+- El centroide de la región.
+- Un punto matemáticamente centrado que sirviera como referencia para un
+  posible abastecimiento de embarcaciones.
+
+Flujo general:
+
+Imagen -> Puntos -> Polinomios cúbicos -> f(x), g(x)
+       -> Área -> Volumen y centroide.
+
+======================================================================
+2. OBTENCIÓN DE LOS DATOS MEDIANTE GEOGEBRA
+======================================================================
+
+Primero se colocó una imagen satelital del lago sobre un plano cartesiano
+en GeoGebra.
+
+Se estableció una escala de:
+
+1 unidad = 1 km.
+
+Esto significa que una distancia de una unidad en el eje cartesiano
+representa un kilómetro real.
+
+La escala afecta las magnitudes de distinta manera:
+
+Distancia real = s · distancia del modelo.
+Área real      = s² · área del modelo.
+Volumen real   = s³ · volumen del modelo.
+
+Como en este proyecto s = 1, los valores numéricos del sistema cartesiano
+coinciden directamente con kilómetros, kilómetros cuadrados y kilómetros
+cúbicos.
+
+¿POR QUÉ SE SELECCIONARON PUNTOS?
+
+El contorno del lago no tiene una forma regular. Por eso, se seleccionaron
+puntos en lugares donde:
+
+- Cambiaba notoriamente la dirección de la costa.
+- Aparecían curvaturas importantes.
+- Terminaba una forma relativamente suave y comenzaba otra.
+- Era necesario separar el contorno en diferentes tramos.
+
+Los puntos de la parte superior originaron la función f(x), mientras que
+los puntos inferiores originaron g(x).
+
+- f(x): borde norte o superior.
+- g(x): borde sur o inferior.
+
+Para un mismo valor de x, la altura vertical del lago es:
+
+h(x) = f(x) - g(x).
+
+Esta diferencia es fundamental porque posteriormente se utiliza tanto en
+la suma de Riemann como en la integral.
+
+======================================================================
+3. INTERPOLACIÓN POLINOMIAL CÚBICA
+======================================================================
+
+¿POR QUÉ SE UTILIZARON CUATRO PUNTOS?
+
+Por cada tramo se seleccionaron cuatro puntos. Con cuatro puntos de
+coordenadas x diferentes se puede construir un único polinomio de grado
+máximo tres:
+
+P(x) = ax³ + bx² + cx + d.
+
+Este polinomio tiene cuatro coeficientes desconocidos:
+
+a, b, c, d.
+
+Cada punto aporta una ecuación. Si los puntos son:
+
+(x₁,y₁), (x₂,y₂), (x₃,y₃), (x₄,y₄),
+
+entonces el polinomio debe cumplir:
+
+P(x₁) = y₁,
+P(x₂) = y₂,
+P(x₃) = y₃,
+P(x₄) = y₄.
+
+Esto genera el sistema:
+
+ax₁³ + bx₁² + cx₁ + d = y₁,
+ax₂³ + bx₂² + cx₂ + d = y₂,
+ax₃³ + bx₃² + cx₃ + d = y₃,
+ax₄³ + bx₄² + cx₄ + d = y₄.
+
+La matriz de este sistema se conoce como matriz de Vandermonde.
+
+El programa utiliza numpy.polyfit para encontrar los cuatro coeficientes.
+Al utilizar exactamente cuatro puntos distintos y un polinomio de grado
+tres, el resultado funciona como una interpolación: el polinomio pasa por
+los cuatro puntos.
+
+Archivo relacionado:
+calculadora_curvas_polinomicas.py
+
+¿POR QUÉ NO SE UTILIZÓ UN ÚNICO POLINOMIO?
+
+Un solo polinomio de grado muy alto podría presentar oscilaciones
+artificiales y sería difícil de interpretar. Este problema se relaciona
+con el fenómeno de Runge.
+
+En cambio, utilizar varios polinomios cúbicos permite:
+
+- Trabajar con ecuaciones manejables.
+- Adaptarse mejor a distintas curvaturas.
+- Evitar oscilaciones exageradas.
+- Integrar cada tramo con facilidad.
+- Modificar una zona sin alterar todo el contorno.
+
+Por eso se construyó una función por tramos.
+
+======================================================================
+4. FUNCIONES DEFINIDAS POR TRAMOS
+======================================================================
+
+Una función por tramos utiliza una ecuación diferente según el valor de x.
+En este proyecto, cada borde contiene cinco polinomios cúbicos.
+
+La estructura general es:
+
+f(x) = f₁(x), para 0 <= x <= 2,44.
+       f₂(x), para 2,44 < x <= 6,47.
+       f₃(x), para 6,47 < x <= 10,5.
+       f₄(x), para 10,5 < x <= 14,77.
+       f₅(x), para 14,77 < x <= 22,5.
+
+La función inferior g(x) utiliza los mismos intervalos.
+
+El dominio utilizado para los cálculos es:
+
+[0; 22,5].
+
+Esto significa que el modelo recorre aproximadamente 22,5 km desde el
+extremo izquierdo hasta el derecho.
+
+La región modelada puede escribirse como:
+
+R = {(x,y): 0 <= x <= 22,5 y g(x) <= y <= f(x)}.
+
+Archivos relacionados:
+functions/funciones.py
+functions/funcion_por_tramos.py
+
+======================================================================
+5. SUMA DE RIEMANN
+======================================================================
+
+ORIGEN DEL MÉTODO
+
+La suma de Riemann nace de la idea de aproximar una región curva mediante
+rectángulos.
+
+Si dividimos el intervalo [a,b] en n partes iguales, el ancho de cada
+rectángulo es:
+
+Δx = (b-a)/n.
+
+En este proyecto:
+
+a = 0 y b = 22,5.
+
+Por lo tanto:
+
+Δx = 22,5/n.
+
+Ejemplos:
+
+n = 8:  Δx = 2,8125 km.
+n = 15: Δx = 1,5 km.
+n = 30: Δx = 0,75 km.
+n = 50: Δx = 0,45 km.
+
+Cuando aumenta n, disminuye Δx, por lo que los rectángulos representan
+mejor el contorno.
+
+ALTURA DE CADA RECTÁNGULO
+
+La parte superior del rectángulo está determinada por f(x) y la inferior
+por g(x). Por eso, su altura es:
+
+f(xᵢ*) - g(xᵢ*).
+
+El área de un rectángulo es:
+
+Aᵢ = [f(xᵢ*) - g(xᵢ*)] Δx.
+
+Sumando todos los rectángulos:
+
+Aₙ = Σ [f(xᵢ*) - g(xᵢ*)] Δx.
+
+MÉTODO DEL PUNTO MEDIO
+
+En el método del punto medio, la función se evalúa en el centro de cada
+subintervalo:
+
+xᵢ* = a + (i + 1/2)Δx.
+
+Se escogió principalmente porque suele representar mejor el comportamiento
+promedio de la curva que utilizar solamente el extremo izquierdo o derecho.
+
+Extremo izquierdo:
+
+xᵢ* = a + iΔx.
+
+Extremo derecho:
+
+xᵢ* = a + (i+1)Δx.
+
+Punto medio:
+
+xᵢ* = a + (i+1/2)Δx.
+
+Archivo relacionado:
+Area/metodos_riemann.py
+
+RESULTADOS
+
+Riemann, n = 15: 175,047 km².
+Riemann, n = 30: 174,671 km².
+Riemann, n = 50: 174,335 km².
+Integral:          174,316 km².
+Referencia:        176 km².
+
+La diferencia respecto de la integral disminuye:
+
+|175,047 - 174,316| = 0,731 km².
+|174,671 - 174,316| = 0,355 km².
+|174,335 - 174,316| = 0,019 km².
+
+Esto muestra la convergencia de la suma de Riemann.
+
+======================================================================
+6. INTEGRAL DEFINIDA
+======================================================================
+
+ORIGEN DE LA INTEGRAL
+
+La integral definida se define como el límite de las sumas de Riemann
+cuando el número de rectángulos tiende a infinito:
+
+Integral de h(x) entre a y b
+= límite cuando n tiende a infinito de Σ h(xᵢ*)Δx.
+
+En este proyecto:
+
+h(x) = f(x) - g(x).
+
+Por lo tanto, el área es:
+
+A = integral entre 0 y 22,5 de [f(x)-g(x)] dx.
+
+La fórmula del área entre curvas proviene de considerar una franja vertical
+infinitamente delgada:
+
+dA = [f(x)-g(x)] dx.
+
+La diferencia f(x)-g(x) es la altura de la franja y dx representa su ancho.
+Al sumar infinitas franjas se obtiene:
+
+A = integral entre a y b de [f(x)-g(x)] dx.
+
+INTEGRACIÓN DE LOS POLINOMIOS
+
+Para un polinomio cúbico:
+
+P(x) = ax³ + bx² + cx + d,
+
+su antiderivada es:
+
+Integral de P(x) dx
+= (a/4)x⁴ + (b/3)x³ + (c/2)x² + dx + C.
+
+Esto proviene de la regla de potencia:
+
+Integral de xⁿ dx = xⁿ⁺¹/(n+1) + C, para n distinto de -1.
+
+Como las funciones están definidas por tramos, teóricamente el cálculo
+completo es:
+
+A = integral de 0 a 2,44 de (f₁-g₁) dx
+  + integral de 2,44 a 6,47 de (f₂-g₂) dx
+  + integral de 6,47 a 10,5 de (f₃-g₃) dx
+  + integral de 10,5 a 14,77 de (f₄-g₄) dx
+  + integral de 14,77 a 22,5 de (f₅-g₅) dx.
+
+El programa utiliza scipy.integrate.quad, es decir, realiza una integración
+numérica adaptativa. El fundamento matemático sigue siendo la integral
+definida, aunque el código no escribe explícitamente las antiderivadas.
+
+El resultado fue:
+
+A = 174,316 km² aproximadamente.
+
+COMPARACIÓN CON EL VALOR DE REFERENCIA
+
+El área de referencia utilizada es:
+
+A_ref = 176 km².
+
+El error porcentual se calcula mediante:
+
+Error porcentual
+= |A_modelo - A_ref| / A_ref · 100.
+
+Entonces:
+
+Error = |174,316 - 176| / 176 · 100
+      = 0,96 % aproximadamente.
+
+DISTINCIÓN IMPORTANTE PARA LA DEFENSA
+
+La integral es el valor más preciso para el modelo polinomial, pero eso no
+significa que obligatoriamente sea el valor más cercano al lago real.
+
+Por ejemplo, Riemann con n = 15 entrega 175,047 km², que casualmente está
+más cerca de 176 km². Sin embargo, al aumentar n, las sumas convergen a
+174,316 km².
+
+- Convergencia: cercanía de Riemann a la integral del modelo.
+- Exactitud real: cercanía del modelo al lago verdadero.
+
+Un resultado puede converger perfectamente y aun así contener errores
+provenientes de la imagen, la escala o los puntos seleccionados.
+
+======================================================================
+7. TEOREMA FUNDAMENTAL DEL CÁLCULO
+======================================================================
+
+Este teorema conecta la derivación con la integración.
+
+Si F'(x) = f(x), entonces:
+
+Integral entre a y b de f(x) dx = F(b)-F(a).
+
+Esto significa que, para calcular una integral definida, se puede encontrar
+una antiderivada y evaluarla en los extremos.
+
+En el proyecto, este teorema justifica que los polinomios cúbicos puedan
+integrarse para obtener el área.
+
+¿SE UTILIZARON DERIVADAS DIRECTAMENTE?
+
+El programa utiliza principalmente cálculo integral. No calcula
+explícitamente derivadas para obtener los resultados.
+
+Sin embargo, las derivadas permiten interpretar las curvas. Para:
+
+P(x) = ax³ + bx² + cx + d,
+
+la primera derivada es:
+
+P'(x) = 3ax² + 2bx + c.
+
+Esta representa la pendiente o velocidad de cambio del contorno.
+
+La segunda derivada es:
+
+P''(x) = 6ax + 2b.
+
+Esta ayuda a estudiar la concavidad y los cambios de curvatura.
+
+Respuesta sugerida si preguntan dónde aparece el cálculo diferencial:
+
+"El cálculo principal del proyecto es integral. Las derivadas se relacionan
+mediante el Teorema Fundamental del Cálculo y también permiten analizar la
+pendiente y concavidad de los polinomios, aunque esas derivadas no se
+utilizaron directamente en el código para calcular el área."
+
+======================================================================
+8. MODELO ELÍPTICO
+======================================================================
+
+Como comparación, el lago también se aproximó mediante una elipse.
+
+La ecuación general de una elipse es:
+
+(x-h)²/a² + (y-k)²/b² = 1,
+
+donde:
+
+- (h,k) es el centro.
+- a es el semieje horizontal.
+- b es el semieje vertical.
+
+En el código:
+
+h = 11,25; k = 5,6; a = 11,25; b = 5,6.
+
+Por lo tanto:
+
+Eje mayor = 2a = 22,5 km.
+Eje menor = 2b = 11,2 km.
+
+Despejando y:
+
+y_superior(x) = k + b·raíz(1-(x-h)²/a²).
+y_inferior(x) = k - b·raíz(1-(x-h)²/a²).
+
+La altura vertical es:
+
+y_superior - y_inferior = 2b·raíz(1-(x-h)²/a²).
+
+Al integrar esta altura se obtiene el área de la elipse:
+
+A_elipse = πab.
+
+Con los datos del código:
+
+A_elipse = π(11,25)(5,6) = 197,920 km² aproximadamente.
+
+La elipse sobreestima el área porque ignora las irregularidades del
+contorno real.
+
+======================================================================
+9. VOLUMEN APROXIMADO
+======================================================================
+
+ORIGEN DE LA FÓRMULA
+
+En general, el volumen se obtiene sumando áreas transversales:
+
+V = integral de A(z) dz.
+
+Si el área horizontal se mantiene constante con la profundidad, entonces:
+
+V = integral entre 0 y h de A dz.
+
+Como A es constante:
+
+V = A·h.
+
+Esta es la misma fórmula del volumen de un prisma. El lago se modela como
+si su área superficial se extendiera verticalmente con una profundidad
+constante.
+
+PROFUNDIDAD EMPLEADA
+
+El programa utiliza:
+
+h = 0,12 km = 120 m.
+
+Con el área de las funciones:
+
+V_funciones = 174,316 · 0,12
+            = 20,918 km³ aproximadamente.
+
+Con el área elíptica:
+
+V_elipse = 197,920 · 0,12
+         = 23,750 km³ aproximadamente.
+
+Si se usa como referencia un volumen de 21 km³:
+
+Error = |20,918 - 21| / 21 · 100
+      = 0,39 % aproximadamente.
+
+Ese valor de referencia debe acompañarse de una fuente bibliográfica
+verificable. Es mejor llamarlo "volumen real de referencia" y no afirmar
+que es una medición absolutamente exacta.
+
+INCONSISTENCIA IMPORTANTE DEL INFORME
+
+En los preliminares del informe se afirma que el volumen se obtiene mediante
+secciones transversales semicirculares. Sin embargo, el código actual no
+utiliza semicircunferencias. Utiliza:
+
+V = A · 0,12.
+
+Si realmente se utilizaran secciones semicirculares y el diámetro fuera
+f(x)-g(x), el área transversal sería:
+
+A(x) = (1/2)π([f(x)-g(x)]/2)²
+     = (π/8)[f(x)-g(x)]².
+
+Entonces el volumen sería:
+
+V = integral entre a y b de (π/8)[f(x)-g(x)]² dx.
+
+Esa fórmula no aparece implementada en el programa.
+
+Para la defensa, deben elegir una sola versión. La más coherente con el
+código es:
+
+"Se supuso una profundidad constante de 120 metros y se multiplicó el área
+superficial por esa profundidad."
+
+No conviene decir que el programa emplea semicircunferencias, porque sería
+fácil demostrar que no lo hace.
+
+======================================================================
+10. CENTROIDE
+======================================================================
+
+¿QUÉ ES?
+
+El centroide es el centro geométrico de una región plana con densidad
+uniforme. Puede imaginarse como el punto en el que una lámina con la forma
+del lago podría equilibrarse.
+
+No representa necesariamente:
+
+- La zona más profunda.
+- El centro geográfico exacto.
+- El lugar automáticamente óptimo para instalar combustible.
+
+Es solamente el centro geométrico del modelo.
+
+COORDENADA HORIZONTAL
+
+El área total es:
+
+A = integral entre a y b de [f(x)-g(x)] dx.
+
+El momento respecto del eje y es:
+
+M_y = integral entre a y b de x[f(x)-g(x)] dx.
+
+Por lo tanto:
+
+x_barra = M_y/A
+        = integral de x[f(x)-g(x)] dx / A.
+
+El factor x da mayor peso a las áreas que se encuentran más alejadas del
+eje y.
+
+COORDENADA VERTICAL
+
+Para una franja vertical, el momento respecto del eje x es:
+
+Integral entre g(x) y f(x) de y dy
+= (1/2)[f(x)²-g(x)²].
+
+Entonces:
+
+M_x = (1/2) integral entre a y b de [f(x)²-g(x)²] dx.
+
+La coordenada vertical es:
+
+y_barra = M_x/A.
+
+RESULTADO
+
+El programa entrega:
+
+(x_barra,y_barra) = (11,445; 5,512).
+
+Esto significa que el centro geométrico del área modelada se encuentra
+aproximadamente a:
+
+- 11,445 km desde el extremo izquierdo del sistema.
+- 5,512 km desde la parte inferior del sistema cartesiano.
+
+RELACIÓN CON EL ABASTECIMIENTO
+
+El centroide puede utilizarse como un punto inicial porque queda
+geométricamente centrado respecto de la distribución del área.
+
+Sin embargo, una ubicación real también requiere estudiar:
+
+- Profundidad local.
+- Acceso desde la costa.
+- Cercanía a muelles.
+- Rutas de navegación.
+- Oleaje y vientos.
+- Riesgo de derrames.
+- Impacto ambiental.
+- Permisos.
+- Coordenadas geográficas reales.
+
+Respuesta sugerida:
+
+"El centroide es una referencia matemática inicial para estudiar la
+ubicación del punto de abastecimiento, pero no constituye por sí solo una
+decisión de ingeniería definitiva."
+
+======================================================================
+11. FLUJO COMPLETO DEL PROGRAMA
+======================================================================
+
+PASO 1: IMAGEN SATELITAL
+
+Se obtuvo una imagen del Lago Villarrica y se colocó sobre un plano
+cartesiano.
+
+PASO 2: ESCALA
+
+Se utilizó una escala de una unidad por kilómetro para relacionar las
+coordenadas con dimensiones reales.
+
+PASO 3: SELECCIÓN DE PUNTOS
+
+Se escogieron puntos en el contorno superior e inferior, priorizando
+cambios visibles de curvatura.
+
+PASO 4: INTERPOLACIÓN
+
+Cada grupo de cuatro puntos generó un polinomio cúbico:
+
+P(x) = ax³ + bx² + cx + d.
+
+PASO 5: FUNCIONES POR TRAMOS
+
+Los polinomios superiores se unieron para construir f(x) y los inferiores
+para construir g(x).
+
+PASO 6: ALTURA DEL LAGO
+
+Para cada posición horizontal se calculó:
+
+h(x) = f(x)-g(x).
+
+PASO 7: RIEMANN
+
+Se dividió el intervalo en n subintervalos:
+
+Δx = 22,5/n.
+
+Luego se sumaron las áreas de los rectángulos:
+
+A_n = Σ[f(xᵢ*)-g(xᵢ*)]Δx.
+
+PASO 8: INTEGRAL
+
+Se calculó el límite continuo:
+
+A = integral entre 0 y 22,5 de [f(x)-g(x)] dx.
+
+PASO 9: COMPARACIÓN
+
+El área obtenida se comparó con 176 km² y se calculó un error cercano al
+0,96 %.
+
+PASO 10: VOLUMEN
+
+Se asumió una profundidad constante:
+
+V = A · 0,12.
+
+PASO 11: CENTROIDE
+
+Se calcularon los momentos y posteriormente:
+
+x_barra = M_y/A.
+y_barra = M_x/A.
+
+PASO 12: INTERFAZ
+
+La interfaz permite seleccionar:
+
+- Cantidad de rectángulos.
+- Extremo izquierdo.
+- Extremo derecho.
+- Punto medio.
+
+Después muestra gráficamente los rectángulos, las curvas y los resultados.
+
+======================================================================
+12. LIMITACIONES QUE SE DEBEN SABER EXPLICAR
+======================================================================
+
+IMAGEN
+
+La imagen puede tener errores de resolución, perspectiva o deformación.
+
+ESCALA
+
+Un pequeño error en la escala afecta más al área y al volumen:
+
+A es proporcional a s².
+V es proporcional a s³.
+
+SELECCIÓN DE PUNTOS
+
+Los puntos fueron elegidos según el criterio visual del grupo. Otros puntos
+producirían polinomios diferentes.
+
+REDONDEO
+
+Los coeficientes se guardaron con una cantidad limitada de decimales, lo
+que puede introducir pequeñas discontinuidades entre tramos.
+
+POLINOMIOS CÚBICOS
+
+Los polinomios suavizan la costa y no representan cada irregularidad
+natural.
+
+PROFUNDIDAD CONSTANTE
+
+El volumen supone 120 metros en toda la superficie, aunque la profundidad
+real cambia según la zona.
+
+CENTROIDE
+
+El centroide supone una región homogénea y solamente considera geometría,
+no condiciones ambientales ni operacionales.
+
+======================================================================
+13. PREGUNTAS PROBABLES DE LA DEFENSA
+======================================================================
+
+¿POR QUÉ UTILIZARON POLINOMIOS DE GRADO TRES?
+
+Porque cuatro puntos determinan un polinomio cúbico único. Además, el grado
+tres proporciona suficiente flexibilidad para representar curvaturas sin
+utilizar polinomios globales de grado muy alto.
+
+¿POR QUÉ FUNCIONES POR TRAMOS?
+
+Porque el contorno cambia de forma. Un único polinomio sería menos
+controlable y podría generar oscilaciones artificiales.
+
+¿POR QUÉ SE RESTA g(x) DE f(x)?
+
+Porque f(x) representa el borde superior y g(x) el inferior. La diferencia
+es la altura vertical de la región.
+
+¿QUÉ REPRESENTA Δx?
+
+El ancho de cada rectángulo:
+
+Δx = (b-a)/n.
+
+¿POR QUÉ AUMENTA LA PRECISIÓN AL AUMENTAR n?
+
+Porque disminuye el ancho de los rectángulos y estos se adaptan mejor a las
+curvas.
+
+¿POR QUÉ USARON EL PUNTO MEDIO?
+
+Porque evalúa la altura en el centro de cada subintervalo y normalmente
+equilibra mejor las sobreestimaciones y subestimaciones.
+
+¿LA INTEGRAL ENTREGA EL ÁREA REAL EXACTA?
+
+No. Entrega el área del modelo polinomial. El modelo continúa siendo una
+aproximación del lago real.
+
+¿POR QUÉ EL RESULTADO NO ES EXACTAMENTE 176 km²?
+
+Por la resolución de la imagen, la escala, la selección de puntos, la
+interpolación y el suavizado del contorno.
+
+¿CÓMO SE OBTUVO EL VOLUMEN?
+
+Multiplicando el área por una profundidad constante de 0,12 km:
+
+V = A·h.
+
+¿EL PROGRAMA UTILIZA SEMICIRCUNFERENCIAS?
+
+No. El código actual utiliza profundidad constante. La mención a
+semicircunferencias en los preliminares debe corregirse si se va a defender
+el código actual.
+
+¿QUÉ REPRESENTA EL CENTROIDE?
+
+El centro geométrico de la región plana modelada, suponiendo una
+distribución uniforme.
+
+¿EL CENTROIDE ES AUTOMÁTICAMENTE EL MEJOR PUNTO DE ABASTECIMIENTO?
+
+No. Es solamente una referencia matemática. La decisión real necesita
+variables ambientales, logísticas y legales.
+
+======================================================================
+14. GUION BREVE PARA EXPLICAR EL PROYECTO ORALMENTE
+======================================================================
+
+"Primero ubicamos una imagen satelital del Lago Villarrica en GeoGebra y
+establecimos una escala de una unidad por kilómetro. Después seleccionamos
+puntos en las zonas donde el contorno presentaba cambios notorios de
+curvatura. Cada grupo de cuatro puntos permitió obtener un polinomio cúbico
+mediante interpolación.
+
+Los polinomios superiores se agruparon en una función por tramos f(x),
+mientras que los inferiores formaron g(x). La diferencia f(x)-g(x)
+representa la altura vertical del lago para cada valor de x.
+
+Con esta diferencia aproximamos el área mediante sumas de Riemann. Dividimos
+el intervalo en subintervalos y construimos rectángulos cuya altura era
+f(x_i)-g(x_i). Al aumentar el número de rectángulos, los resultados
+convergieron hacia el valor obtenido mediante la integral definida.
+
+La integral del modelo entregó aproximadamente 174,316 kilómetros cuadrados,
+con un error cercano al 0,96 % respecto de los 176 kilómetros cuadrados de
+referencia.
+
+Para el volumen asumimos una profundidad constante de 120 metros y
+utilizamos V=Ah, obteniendo aproximadamente 20,918 kilómetros cúbicos.
+Finalmente, calculamos el centroide mediante momentos de área, obteniendo el
+punto (11,445; 5,512). Este punto sirve como referencia matemática para
+estudiar una posible ubicación de abastecimiento, aunque una decisión real
+necesitaría considerar factores ambientales y operacionales."
+
+======================================================================
+ADVERTENCIA PRINCIPAL PARA LA DEFENSA
+======================================================================
+
+Hay que unificar la explicación del volumen. El informe menciona secciones
+transversales semicirculares, pero el código de Volumen/volumen.py utiliza
+una profundidad constante. Esa diferencia puede convertirse en una
+pregunta importante durante la presentación.
