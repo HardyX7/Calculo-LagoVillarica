@@ -475,34 +475,6 @@ Ese valor de referencia debe acompañarse de una fuente bibliográfica
 verificable. Es mejor llamarlo "volumen real de referencia" y no afirmar
 que es una medición absolutamente exacta.
 
-INCONSISTENCIA IMPORTANTE DEL INFORME
-
-En los preliminares del informe se afirma que el volumen se obtiene mediante
-secciones transversales semicirculares. Sin embargo, el código actual no
-utiliza semicircunferencias. Utiliza:
-
-V = A · 0,12.
-
-Si realmente se utilizaran secciones semicirculares y el diámetro fuera
-f(x)-g(x), el área transversal sería:
-
-A(x) = (1/2)π([f(x)-g(x)]/2)²
-     = (π/8)[f(x)-g(x)]².
-
-Entonces el volumen sería:
-
-V = integral entre a y b de (π/8)[f(x)-g(x)]² dx.
-
-Esa fórmula no aparece implementada en el programa.
-
-Para la defensa, deben elegir una sola versión. La más coherente con el
-código es:
-
-"Se supuso una profundidad constante de 120 metros y se multiplicó el área
-superficial por esa profundidad."
-
-No conviene decir que el programa emplea semicircunferencias, porque sería
-fácil demostrar que no lo hace.
 
 ======================================================================
 10. CENTROIDE
@@ -809,11 +781,3 @@ punto (11,445; 5,512). Este punto sirve como referencia matemática para
 estudiar una posible ubicación de abastecimiento, aunque una decisión real
 necesitaría considerar factores ambientales y operacionales."
 
-======================================================================
-ADVERTENCIA PRINCIPAL PARA LA DEFENSA
-======================================================================
-
-Hay que unificar la explicación del volumen. El informe menciona secciones
-transversales semicirculares, pero el código de Volumen/volumen.py utiliza
-una profundidad constante. Esa diferencia puede convertirse en una
-pregunta importante durante la presentación.
