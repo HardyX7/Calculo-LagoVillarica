@@ -53,5 +53,5 @@ g.agregar_tramo(10.5, PolinomioGradoTres(0.088073, -2.045153, 15.29131, -35.5366
 g.agregar_tramo(14.77, PolinomioGradoTres(-0.086657, 3.353787, -43.204039, 185.703326))
 g.agregar_tramo(22.5, PolinomioGradoTres(0.039951, -2.044563, 34.996752, -199.6006764))
 
-elipse = Elipse(11.25, 5.6, 11.25, 5.6)
+elipse = Elipse(11.5, 5.5, 11.5, 5.5)
 
